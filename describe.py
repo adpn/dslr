@@ -1,23 +1,26 @@
 import sys
 from utils import parse_csv
 from stats_utils import mean, std, min, max, percentile
+import math
 
 def describe(content : dict[str, list[str]]) -> dict:
 	stats : dict = {}
 	for key, values in content.items():
-		try:
-			test = float(values[0])
-			if key == "Index":
-				continue
-		except:
+		if key == "Index":
 			continue
 
 		temp = []
-		for i in range(len(values)):
+		for value in values:
 			try :
-				temp.append(float(values[i]))
+				value = float(value)
+				if math.isnan(value) or math.isinf(value):
+					continue
+				temp.append(value)
 			except:
 				continue
+
+		if (len(temp) == 0):
+			continue
 
 		stats[key] = {
 			"Count": len(temp),
@@ -29,6 +32,7 @@ def describe(content : dict[str, list[str]]) -> dict:
 			"75%": percentile(temp, 75),
 			"Max": max(temp)
 		}
+
 	return stats
 	
 def print_stats(stats : dict):
