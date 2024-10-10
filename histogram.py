@@ -3,25 +3,43 @@ from utils import parse_csv, separateHouses
 from math import isnan, isinf
 import matplotlib.pyplot as plt
 
-def prepData(house_data : dict[str, dict[str, list[str]]]) -> dict:
-	# f = open("house_test.txt",'w')
-	# f.write(str(house_data))
-	pass
+# doesn't keep index relations
+def prepData(house_data : dict[str, dict[str, list]], feature : str) -> None:
+	for house, house_dict in house_data.items():
+		new_list : list[float] = []
+		for value in house_dict[feature]:
+			try:
+				to_add = float(value)
+				if isnan(to_add) or isinf(to_add):
+					continue
+				new_list.append(to_add)
+			except:
+				continue
+		house_dict[feature] = new_list
 
-def histogram(stats : dict):
+def histogram(data : dict[str, dict[str, list[str]]]):
+	feature = "Care of Magical Creatures"
+	# first_house : str = next(iter(data))
+	# for feature in data[first_house]:
+	# 	if feature == "index":
+	# 		continue
+	prepData(data, feature)
+	# if not len(data[first_house][feature]):
+	# 	continue
 	fig, ax = plt.subplots()
-	ax.hist(stats["means"])
-	plt.savefig("hist.png")
+	for house, values in data.items():
+		ax.hist(values[feature], histtype='barstacked', alpha=0.5, label=house)
+	ax.set_title(feature)
+	ax.legend(prop={'size': 10})
+	plt.savefig(f"hist_{feature}.png")
 
 def main() -> int:
 	if (len(sys.argv) != 2):
 		print("Usage: python3 describe.py <dataset>")
 		return 1
 	try:
-		filename = sys.argv[1]
-		content = parse_csv(filename)
-		house_data = separateHouses(content)
-		# histogram(house_data)
+		house_data = separateHouses(parse_csv(sys.argv[1]))
+		histogram(house_data)
 	except Exception as e:
 		print("Error:", e)
 		return 1
