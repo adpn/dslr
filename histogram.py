@@ -35,7 +35,7 @@ def histogram(data : dict[str, dict[str, list[str]]]):
 
 def main() -> int:
 	if (len(sys.argv) != 2):
-		print("Usage: python3 describe.py <dataset>")
+		print("Usage: python3 histogram.py <dataset>")
 		return 1
 	try:
 		house_data = separateHouses(parse_csv(sys.argv[1]))
