@@ -1,56 +1,12 @@
 import sys
-from utils import parse_csv
+from utils import parse_csv, separateHouses
 from math import isnan, isinf
 import matplotlib.pyplot as plt
 
-# need to do this with std deviation or sumn i think
-def homogynousFeature(content : dict[str, list[str]]) -> dict:
-	feature : str = ""
-	means : dict[str, dict]
-	diff : float
-	# separate data by house
-	for key, values in content.items():
-		key_means : dict[str, dict] = {}
-		if key == "Index" or key == "Hogwarts House":
-			continue
-		i = int(0)
-		while i < len(values):
-			i += 1
-			house = content["Hogwarts House"][i - 1]
-			if not house:
-				continue
-			try:
-				value = float(values[i - 1])
-				if isnan(value) or isinf(value):
-					continue
-				if not house in key_means:
-					key_means[house] = {"mean": value, "count": int(1)}
-					continue
-				# mean = (old_mean * n + value) / (n + 1)
-				key_means[house]["mean"] = (key_means[house]["mean"] * key_means[house]["count"] + value) / (key_means[house]["count"] + 1)
-				key_means[house]["count"] += 1
-			except:
-				continue
-		if not len(key_means):
-			continue
-		# homogeneity test
-		means_mean = float(0)
-		for house, duo in key_means.items():
-			means_mean += duo["mean"]
-		means_mean /= len(key_means)
-		key_diff = float(0)
-		for house, duo in key_means.items():
-			key_diff += abs(means_mean - duo["mean"])
-		if not feature or key_diff < diff:
-			feature = key
-			means = key_means
-			diff = key_diff
-	res_houses : list[str] = []
-	res_means : list[float] = []
-	for key, values in means.items():
-		res_houses.append(key)
-		res_means.append(values["mean"])
-	return {"feature": feature, "houses": res_houses, "means": res_means}
+def prepData(house_data : dict[str, dict[str, list[str]]]) -> dict:
+	# f = open("house_test.txt",'w')
+	# f.write(str(house_data))
+	pass
 
 def histogram(stats : dict):
 	fig, ax = plt.subplots()
@@ -64,8 +20,8 @@ def main() -> int:
 	try:
 		filename = sys.argv[1]
 		content = parse_csv(filename)
-		feature = homogynousFeature(content)
-		histogram(feature)
+		house_data = separateHouses(content)
+		# histogram(house_data)
 	except Exception as e:
 		print("Error:", e)
 		return 1
