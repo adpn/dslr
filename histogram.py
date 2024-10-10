@@ -15,7 +15,7 @@ def histogram(stats : dict):
 
 def main() -> int:
 	if (len(sys.argv) != 2):
-		print("Usage: python3 describe.py <dataset>")
+		print("Usage: python3 histogram.py <dataset>")
 		return 1
 	try:
 		filename = sys.argv[1]

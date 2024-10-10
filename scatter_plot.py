@@ -4,24 +4,8 @@ import math
 import matplotlib.pyplot as plt
 
 def remove_everywhere(data : dict[str, list[str]], index : int):
-	for key, values in data.items():
+	for _, values in data.items():
 		values.pop(index)
-
-# negative correlation found between Astronomy and Defense Against the Dark Arts
-def generate_every_scatter_plot(house_data : dict[str, dict[str, list[str]]]):
-	courses = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
-	for name in courses:
-		for name2 in courses:
-			if name == name2:
-				continue
-			print("Generating " + name + "_" + name2)
-			for key, values in house_data.items():
-				plt.scatter(values[name], values[name2], label=key, alpha=0.5)
-			plt.xlabel(name)
-			plt.ylabel(name2)
-			plt.legend()
-			plt.savefig("scatter/" + name + "_" + name2 + ".png")
-			plt.clf()
 
 def generate_scatter_plot(house_data : dict[str, dict[str, list[str]]]):
 	features = ("Astronomy", "Defense Against the Dark Arts")
@@ -35,10 +19,10 @@ def generate_scatter_plot(house_data : dict[str, dict[str, list[str]]]):
 	plt.clf()
 
 def format_features(data : dict[str, list[str]]):
-	courses = {"Arithmancy" : [], "Astronomy" : [], "Herbology" : [], "Defense Against the Dark Arts" : [], "Divination" : [], "Muggle Studies" : [], "Ancient Runes" : [], "History of Magic" : [], "Transfiguration" : [], "Potions" : [], "Care of Magical Creatures" : [], "Charms" : [], "Flying" : []}
-	for key in courses.keys():
+	features = ("Astronomy", "Defense Against the Dark Arts")
+	courses = {}
+	for key in features:
 		courses[key] = data[key]
-
 	for key, values in courses.items():
 		temp = []
 		i = 0
@@ -62,7 +46,7 @@ def format_features(data : dict[str, list[str]]):
 
 def main() -> int:
 	if (len(sys.argv) != 2):
-		print("Usage: python3 describe.py <dataset>")
+		print("Usage: python3 scatter_plot.py <dataset>")
 		return 1
 	try:
 		filename = sys.argv[1]
