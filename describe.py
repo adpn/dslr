@@ -3,9 +3,9 @@ from utils import parse_csv
 from stats_utils import mean, std, min, max, percentile
 import math
 
-def describe(content : dict[str, list[str]]) -> dict:
+def describe(data : dict[str, list[str]]) -> dict:
 	stats : dict = {}
-	for key, values in content.items():
+	for key, values in data.items():
 		if key == "Index":
 			continue
 
