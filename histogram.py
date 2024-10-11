@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 # doesn't keep index relations
 def prepData(house_data : dict[str, dict[str, list]], feature : str) -> None:
-	for house, house_dict in house_data.items():
+	for values in house_data.values():
 		new_list : list[float] = []
-		for value in house_dict[feature]:
+		for value in values[feature]:
 			try:
 				to_add = float(value)
 				if isnan(to_add) or isinf(to_add):
@@ -15,23 +15,24 @@ def prepData(house_data : dict[str, dict[str, list]], feature : str) -> None:
 				new_list.append(to_add)
 			except:
 				continue
-		house_dict[feature] = new_list
+		values[feature] = new_list
 
-def histogram(data : dict[str, dict[str, list[str]]]):
-	feature = "Care of Magical Creatures"
-	# first_house : str = next(iter(data))
-	# for feature in data[first_house]:
-	# 	if feature == "index":
-	# 		continue
+def histogram(data : dict[str, dict[str, list[str]]], feature : str):
 	prepData(data, feature)
-	# if not len(data[first_house][feature]):
-	# 	continue
-	fig, ax = plt.subplots()
+	if not len(data[next(iter(data))][feature]):
+		return
+	plt.clf()
 	for house, values in data.items():
-		ax.hist(values[feature], histtype='barstacked', alpha=0.5, label=house)
-	ax.set_title(feature)
-	ax.legend(prop={'size': 10})
+		plt.hist(values[feature], histtype='barstacked', alpha=0.5, label=house)
+	plt.title(feature)
+	plt.legend(prop={'size': 10})
 	plt.savefig(f"hist_{feature}.png")
+
+def every_histogram(data : dict[str, dict[str, list[str]]]):
+	for feature in data[next(iter(data))]:
+		if feature == "Index" or feature == "First Name" or feature == "Last Name":
+			continue
+		histogram(data, feature)
 
 def main() -> int:
 	if (len(sys.argv) != 2):
@@ -39,7 +40,7 @@ def main() -> int:
 		return 1
 	try:
 		house_data = separateHouses(parse_csv(sys.argv[1]))
-		histogram(house_data)
+		histogram(house_data, "Care of Magical Creatures")
 	except Exception as e:
 		print("Error:", e)
 		return 1
