@@ -7,21 +7,19 @@ def remove_everywhere(data : dict[str, list[str]], index : int):
 	for _, values in data.items():
 		values.pop(index)
 
-def generate_scatter_plot(house_data : dict[str, dict[str, list[str]]]):
-	features = ("Astronomy", "Defense Against the Dark Arts")
-	print("Generating " + features[0] + "_" + features[1])
+def generate_scatter_plot(house_data : dict[str, dict[str, list[str]]], features : tuple[str]):
+	print(f"Generating {features[0]}_{features[1]}")
 	for key, values in house_data.items():
 		plt.scatter(values[features[0]], values[features[1]], label=key, alpha=0.5)
 	plt.xlabel(features[0])
 	plt.ylabel(features[1])
 	plt.legend()
-	plt.savefig(features[0] + "_" + features[1] + ".png")
+	plt.savefig(f"{features[0]}_{features[1]}.png")
 	plt.clf()
 
-def format_features(data : dict[str, list[str]]):
-	features = ("Astronomy", "Defense Against the Dark Arts")
+def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]):
 	courses = {}
-	for key in features:
+	for key in features_to_keep:
 		courses[key] = data[key]
 	for key, values in courses.items():
 		temp = []
@@ -52,9 +50,10 @@ def main() -> int:
 		filename = sys.argv[1]
 		data : dict = parse_csv(filename)
 		house_data = separateHouses(data)
+		features = ("Astronomy", "Defense Against the Dark Arts")
 		for key in house_data.keys():
-			house_data[key] = format_features(house_data[key])
-		generate_scatter_plot(house_data)
+			house_data[key] = format_features(house_data[key], features)
+		generate_scatter_plot(house_data, features)
 		print("Done")
 	except Exception as e:
 		print("Error:", e)
