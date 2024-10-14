@@ -1,6 +1,9 @@
 import sys
-from utils import parse_csv, separateHouses
-from math import exp, log10, isinf, isnan
+from utils import parse_csv
+from math import exp, isinf, isnan
+
+NB_ITERATIONS = 10000 # totally artificial number
+LEARNING_RATE = 0.0019 # totally artificial number
 
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
@@ -15,29 +18,50 @@ def hypothesis(x : list[float], weights : list[float]) -> float:
 # return value should be between 0 and 1
 # return is a probability
 def logistic(z : float) -> float:
-	print(f"logistic with -z = {-z}")
+	# print(f"logistic with -z = {-z}")
 	return 1 / (1 + exp(-z))
 
-def loop_feature(data : list[dict], weights : list[float], house : str, j : int) -> float:
-	print("we loopin features")			# debug
-	sum : float = 0
-	for student in data:
-		sum += (hypothesis(student["scores"], weights) - int(house == student["house"])) * student["scores"][j]
-	print(f"return {sum}")
-	return sum
+# def loop_feature(data : list[dict], weights : list[float], house : str, j : int) -> float:
+# 	print("we loopin features")			# debug
+# 	sum : float = 0
+# 	for student in data:
+# 		sum += (hypothesis(student["scores"], weights) - int(house == student["house"])) * student["scores"][j]
+# 	print(f"return {sum}")
+# 	return sum
 
-def loop_weight(data : list[dict], weights : list[float], house : str):
-	print("we loopin weights")			# debug
-	m = len(data)
-	for j in range(len(weights)):
-		weights[j] = loop_feature(data, weights, house, j) / m
+# def loop_weight(data : list[dict], weights : list[float], house : str):
+# 	print("we loopin weights")			# debug
+# 	m = len(data)
+# 	for j in range(len(weights)):
+# 		weights[j] = loop_feature(data, weights, house, j) / m
 
 # using the partial derivative formula
 def loop_house(data : list[dict], house_weights : dict[str : list[float]]):
 	print("we loopin houses")			# debug
 	for house in house_weights.keys():
-		loop_weight(data, house_weights[house], house)
+		house_weights[house] = train(data, house, house_weights[house])
+		# loop_weight(data, house_weights[house], house)
 
+# train for one class
+def train(students : list[dict[str, str | list[float]]], housename : str, weights : list[float]):
+	m = len(students)
+	n = len(weights)
+
+	for i in range(NB_ITERATIONS):
+		if i % 100 == 0:
+			print(housename, i)
+		gradiants = [0] * n
+		for student in students:
+			x = student["scores"]
+			y = 1 if student["house"] == housename else 0
+			h = hypothesis(x, weights)
+
+			for j in range(n):
+				gradiants[j] += (h - y) * x[j]
+
+		for j in range(n):
+			weights[j] -= LEARNING_RATE * gradiants[j] / m
+	return weights
 
 # return a list of students, as dictionnary with the house name and scores
 def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
@@ -66,11 +90,10 @@ def main() -> int:
 		filename = sys.argv[1]
 		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
 		house_weights = {"Ravenclaw": [0]*len(features), "Slytherin": [0]*len(features), "Gryffindor": [0]*len(features), "Hufflepuff": [0]*len(features)}
-		print(f"before: {house_weights}")			# debug
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
 		loop_house(student_data, house_weights)
-		print(f"after,, lmao if it works: {house_weights}")			# debug
+		print(house_weights) # should write in a file instead
 
 	except Exception as e:
 		print("Error:", e)
