@@ -5,9 +5,11 @@ from math import exp
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
 # return is a probability
-def hypothesis(x : float, weights : list) -> float:
-	value = 0 #this should come from weights, idk how to calculate it
-	return logistic(value * x)
+def hypothesis(x : list[float], weights : list[float]) -> float:
+	dot_product : float = 0
+	for value, weight in zip(x, weights):
+		dot_product += value * weight
+	return logistic(dot_product)
 
 # g(z) logistic sigmoid function
 # return value should be between 0 and 1
