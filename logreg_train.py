@@ -15,7 +15,29 @@ def hypothesis(x : list[float], weights : list[float]) -> float:
 # return value should be between 0 and 1
 # return is a probability
 def logistic(z : float) -> float:
+	print(f"logistic with -z = {-z}")
 	return 1 / (1 + exp(-z))
+
+def loop_feature(data : list[dict], weights : list[float], house : str, j : int) -> float:
+	print("we loopin features")			# debug
+	sum : float = 0
+	for student in data:
+		sum += (hypothesis(student["scores"], weights) - int(house == student["house"])) * student["scores"][j]
+	print(f"return {sum}")
+	return sum
+
+def loop_weight(data : list[dict], weights : list[float], house : str):
+	print("we loopin weights")			# debug
+	m = len(data)
+	for j in range(len(weights)):
+		weights[j] = loop_feature(data, weights, house, j) / m
+
+# using the partial derivative formula
+def loop_house(data : list[dict], house_weights : dict[str : list[float]]):
+	print("we loopin houses")			# debug
+	for house in house_weights.keys():
+		loop_weight(data, house_weights[house], house)
+
 
 # return a list of students, as dictionnary with the house name and scores
 def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
@@ -42,11 +64,17 @@ def main() -> int:
 		return 1
 	try:
 		filename = sys.argv[1]
+		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
+		house_weights = {"Ravenclaw": [0]*len(features), "Slytherin": [0]*len(features), "Gryffindor": [0]*len(features), "Hufflepuff": [0]*len(features)}
+		print(f"before: {house_weights}")			# debug
 		data : dict = parse_csv(filename)
-		students = format_features(data, ("Astronomy", "Herbology", "Ancient Runes"))
-		print(students)
+		student_data = format_features(data, features)
+		loop_house(student_data, house_weights)
+		print(f"after,, lmao if it works: {house_weights}")			# debug
+
 	except Exception as e:
 		print("Error:", e)
+		e.with_traceback()
 		return 1
 
 if __name__ == "__main__":
