@@ -2,7 +2,7 @@ import sys
 from utils import parse_csv
 from math import exp, isinf, isnan
 
-NB_ITERATIONS = 10000 # totally artificial number
+NB_ITERATIONS = 1000 # totally artificial number
 LEARNING_RATE = 0.0019 # totally artificial number
 
 # hθ(x) hypothesis function
@@ -42,29 +42,31 @@ def logistic(z : float) -> float:
 def loop_house(data : list[dict], house_weights : dict[str : list[float]]):
 	# print("we loopin houses")			# debug
 	for house in house_weights:
-		house_weights[house] = train(data, house, house_weights[house])
+		train(data, house, house_weights[house])
 		# loop_weight(data, house_weights[house], house)
 
 # train for one class
 def train(students : list[dict[str, str | list[float]]], housename : str, weights : list[float]):
 	m = len(students)
 	n = len(weights)
+	old_weights = weights.copy()
 
+	print(f"{housename}:", end="", flush=True)
 	for i in range(NB_ITERATIONS):
-		if i % 100 == 0:
-			print(housename, i)
+		if i % int(NB_ITERATIONS / 10) == 0:
+			print(f" {int(i / int(NB_ITERATIONS / 10))}", end="", flush=True)
 		gradiants = [0] * n
 		for student in students:
 			x = student["scores"]
 			y = 1 if student["house"] == housename else 0
-			h = hypothesis(x, weights)
+			h = hypothesis(x, old_weights)
 
 			for j in range(n):
 				gradiants[j] += (h - y) * x[j]
 
 		for j in range(n):
 			weights[j] -= LEARNING_RATE * gradiants[j] / m
-	return weights
+	print(" >END<")
 
 # return a list of students, as dictionnary with the house name and scores
 def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
@@ -100,7 +102,7 @@ def main() -> int:
 
 	except Exception as e:
 		print("Error:", e)
-		e.with_traceback()
+		e.with_traceback()		# this causes another exception btw, but one with traces, totally intentional
 		return 1
 
 if __name__ == "__main__":
