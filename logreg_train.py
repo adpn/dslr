@@ -4,7 +4,7 @@ from math import exp, isinf, isnan
 from json import dump
 import matplotlib.pyplot as plt
 
-NB_ITERATIONS = 5000 # totally artificial number
+NB_ITERATIONS = 2000 # totally artificial number
 LEARNING_RATE = 0.01 # totally artificial number
 DATA_MAX_VALUE = 100
 
@@ -21,38 +21,19 @@ def hypothesis(x : list[float], weights : list[float]) -> float:
 # return value should be between 0 and 1
 # return is a probability
 def logistic(z : float) -> float:
-	# if z:										# debug
 	# 	print(f"logistic with -z = {-z}")		# debug
 	return 1 / (1 + exp(-z))
 
-# def loop_feature(data : list[dict], weights : list[float], house : str, j : int) -> float:
-# 	# print("we loopin features")			# debug
-# 	sum : float = 0
-# 	for student in data:
-# 		sum += (hypothesis(student["scores"], weights) - int(house == student["house"])) #* student["scores"][j]
-# 	# print(f"return {sum}")				# debug
-# 	return sum
-
-# def loop_weight(data : list[dict], weights : list[float], house : str):
-# 	# print("we loopin weights")			# debug
-# 	m = len(data)
-# 	old_weights = weights.copy()
-#	for j in range(len(weights)):
-# 		weights[j] = loop_feature(data, old_weights, house, j) / m
-		# print (f"new weight just dropped: {weights[j]}")	# debug
-
 # using the partial derivative formula
 def loop_house(data : list[dict], house_weights : dict[str : list[float]]):
-	# print("we loopin houses")			# debug
 	for house in house_weights:
 		train(data, house, house_weights[house])
-		# loop_weight(data, house_weights[house], house)
 
 # train for one class
 def train(students : list[dict[str, str | list[float]]], housename : str, weights : list[float]):
 	m = len(students)
 	n = len(weights)
-	weight_history = []
+	# weight_history = [] # debug
 
 	print(f"{housename}:", end="", flush=True)
 	for i in range(NB_ITERATIONS):
@@ -69,9 +50,9 @@ def train(students : list[dict[str, str | list[float]]], housename : str, weight
 
 		for j in range(n):
 			weights[j] -= LEARNING_RATE * gradiants[j] / m
-		weight_history.append(weights.copy())
+		# weight_history.append(weights.copy()) # debug
 
-	plot_weight_evolution(weight_history, housename)
+	# plot_weight_evolution(weight_history, housename) # debug
 	print(" >END<")
 
 def plot_weight_evolution(weight_history, housename):
