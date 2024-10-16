@@ -3,6 +3,7 @@ from utils import parse_csv
 from math import exp, isinf, isnan
 from json import dump
 import matplotlib.pyplot as plt
+from stats_utils import max, min
 
 NB_ITERATIONS = 2000 # totally artificial number
 LEARNING_RATE = 0.01 # totally artificial number
@@ -96,8 +97,8 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], 
 				feature_stats.append([student["scores"][j], student["scores"][j]])
 		else:
 			for j in range(len(student["scores"])):
-				feature_stats[j][0] = min(feature_stats[j][0], student["scores"][j])
-				feature_stats[j][1] = max(feature_stats[j][1], student["scores"][j])
+				feature_stats[j][0] = min([feature_stats[j][0], student["scores"][j]])
+				feature_stats[j][1] = max([feature_stats[j][1], student["scores"][j]])
 	return students
 
 def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]]):
@@ -124,6 +125,7 @@ def main() -> int:
 		normalise_data(student_data, feature_stats)
 		loop_house(student_data, house_weights)
 		house_weights["features"] = features
+		house_weights["normal"] = DATA_MAX_VALUE
 		dump(house_weights, open('weights.json', 'w'))
 
 	except Exception as e:

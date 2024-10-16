@@ -3,9 +3,7 @@ from utils import parse_csv
 from math import isinf, isnan
 from logreg_train import logistic
 from json import load
-# from stats_utils import max, sum
-
-DATA_MAX_VALUE = 100
+from stats_utils import max, min, sum
 
 def predict(x: list[float], weights: list[float]) -> float:
     dot_product = sum([value * weight for value, weight in zip(x, weights)])
@@ -49,16 +47,16 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], 
 				feature_stats.append([student["scores"][j], student["scores"][j]])
 		else:
 			for j in range(len(student["scores"])):
-				feature_stats[j][0] = min(feature_stats[j][0], student["scores"][j])
-				feature_stats[j][1] = max(feature_stats[j][1], student["scores"][j])
+				feature_stats[j][0] = min([feature_stats[j][0], student["scores"][j]])
+				feature_stats[j][1] = max([feature_stats[j][1], student["scores"][j]])
 	return students
 
-def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]]):
+def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]], max_value : int):
 	shift : list[float] = []
 	ratio : list[float] = []
 	for value in feature_stats:
 		shift.append((value[0] + value[1]) / 2)
-		ratio.append((abs(value[0]) + abs(value[1])) / 2 / DATA_MAX_VALUE)
+		ratio.append((abs(value[0]) + abs(value[1])) / 2 / max_value)
 	for student in data:
 		for i in range(len(shift)):
 			student["scores"][i] = (student["scores"][i] - shift[i]) / ratio[i]
@@ -71,8 +69,8 @@ def main() -> int:
 		filename = sys.argv[1]
 		data : dict = parse_csv(filename)
 		house_weights : dict = load(open("weights.json", 'r'))	# open argv weight file instead
-		features : tuple[str] = house_weights["features"]
-		house_weights.pop("features")
+		features : tuple[str] = house_weights.pop("features")
+		data_max_value = house_weights.pop("normal")
 		feature_stats : list[list[float]] = []
 		student_data = format_features(data, features, feature_stats)
 		normalise_data(student_data, feature_stats)
