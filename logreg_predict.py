@@ -2,6 +2,7 @@ import sys
 from utils import parse_csv
 from math import isinf, isnan
 from logreg_train import logistic
+from json import load
 # from stats_utils import max, sum
 
 def predict(x: list[float], weights: list[float]) -> float:
@@ -44,7 +45,7 @@ def main() -> int:
 		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
-		houseweights = {'Ravenclaw': [-0.08746534561551508, 9.167919618624145, -0.09751236127920083], 'Slytherin': [-0.028803400033930178, -3.0914920753472144, -0.03220244345453278], 'Gryffindor': [0.015075712648868644, -16.119546548597317, -0.2343335972432614], 'Hufflepuff': [0.049450692724162124, 7.185971306027158, -0.07845708389339086]}
+		houseweights = load(open("weights.json", 'r'))
 		
 		NB_TESTS = 1000
 		success = 0

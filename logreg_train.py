@@ -1,6 +1,7 @@
 import sys
 from utils import parse_csv
 from math import exp, isinf, isnan
+from json import dump
 
 NB_ITERATIONS = 1000 # totally artificial number
 LEARNING_RATE = 0.0019 # totally artificial number
@@ -98,7 +99,7 @@ def main() -> int:
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
 		loop_house(student_data, house_weights)
-		print(f"\nAFTER {NB_ITERATIONS}: \n{house_weights}") # should write in a file instead
+		dump(house_weights, open('weights.json', 'w'))
 
 	except Exception as e:
 		print("Error:", e)
