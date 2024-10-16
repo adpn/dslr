@@ -15,27 +15,29 @@ def hypothesis(x : list[float], weights : list[float]) -> float:
 # return value should be between 0 and 1
 # return is a probability
 def logistic(z : float) -> float:
-	print(f"logistic with -z = {-z}")
+	# if z:										# debug
+	# 	print(f"logistic with -z = {-z}")		# debug
 	return 1 / (1 + exp(-z))
 
 def loop_feature(data : list[dict], weights : list[float], house : str, j : int) -> float:
-	print("we loopin features")			# debug
+	# print("we loopin features")			# debug
 	sum : float = 0
 	for student in data:
-		sum += (hypothesis(student["scores"], weights) - int(house == student["house"])) * student["scores"][j]
-	print(f"return {sum}")
+		sum += (hypothesis(student["scores"], weights) - int(house == student["house"])) #* student["scores"][j]
+	# print(f"return {sum}")				# debug
 	return sum
 
 def loop_weight(data : list[dict], weights : list[float], house : str):
-	print("we loopin weights")			# debug
+	# print("we loopin weights")			# debug
 	m = len(data)
 	for j in range(len(weights)):
 		weights[j] = loop_feature(data, weights, house, j) / m
+		# print (f"new weight just dropped: {weights[j]}")	# debug
 
 # using the partial derivative formula
 def loop_house(data : list[dict], house_weights : dict[str : list[float]]):
-	print("we loopin houses")			# debug
-	for house in house_weights.keys():
+	# print("we loopin houses")			# debug
+	for house in house_weights:
 		loop_weight(data, house_weights[house], house)
 
 
@@ -66,11 +68,14 @@ def main() -> int:
 		filename = sys.argv[1]
 		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
 		house_weights = {"Ravenclaw": [0]*len(features), "Slytherin": [0]*len(features), "Gryffindor": [0]*len(features), "Hufflepuff": [0]*len(features)}
-		print(f"before: {house_weights}")			# debug
+		# print(f"before: {house_weights}")			# debug
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
-		loop_house(student_data, house_weights)
-		print(f"after,, lmao if it works: {house_weights}")			# debug
+		for i in range(1000):
+			loop_house(student_data, house_weights)
+			if not (i % 100):
+				print(".", end="", flush=True)
+		print(f"\nAFTER 1000: \n{house_weights}")	# debug
 
 	except Exception as e:
 		print("Error:", e)
