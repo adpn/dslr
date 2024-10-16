@@ -3,10 +3,11 @@ from utils import parse_csv
 from math import exp, isinf, isnan
 from json import dump
 import matplotlib.pyplot as plt
+from stats_utils import max, min
 
-NB_ITERATIONS = 5000 # totally artificial number
-LEARNING_RATE = 0.01 # totally artificial number
-DATA_MAX_VALUE = 100
+NB_ITERATIONS = 1000 # totally artificial number
+LEARNING_RATE = 0.005 # totally artificial number
+DATA_MAX_VALUE = 100 # totally artificial number
 
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
@@ -115,8 +116,8 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], 
 				feature_stats.append([student["scores"][j], student["scores"][j]])
 		else:
 			for j in range(len(student["scores"])):
-				feature_stats[j][0] = min(feature_stats[j][0], student["scores"][j])
-				feature_stats[j][1] = max(feature_stats[j][1], student["scores"][j])
+				feature_stats[j][0] = min([feature_stats[j][0], student["scores"][j]])
+				feature_stats[j][1] = max([feature_stats[j][1], student["scores"][j]])
 	return students
 
 def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]]):

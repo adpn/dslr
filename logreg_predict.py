@@ -3,7 +3,7 @@ from utils import parse_csv
 from math import isinf, isnan
 from logreg_train import logistic
 from json import load
-from stats_utils import max, sum
+from stats_utils import max, min, sum
 
 DATA_MAX_VALUE = 100
 
@@ -49,8 +49,8 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], 
 				feature_stats.append([student["scores"][j], student["scores"][j]])
 		else:
 			for j in range(len(student["scores"])):
-				feature_stats[j][0] = min(feature_stats[j][0], student["scores"][j])
-				feature_stats[j][1] = max(feature_stats[j][1], student["scores"][j])
+				feature_stats[j][0] = min([feature_stats[j][0], student["scores"][j]])
+				feature_stats[j][1] = max([feature_stats[j][1], student["scores"][j]])
 	return students
 
 def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]]):
