@@ -5,6 +5,8 @@ from logreg_train import logistic
 from json import load
 from stats_utils import max, sum
 
+DATA_MAX_VALUE = 100
+
 def predict(x: list[float], weights: list[float]) -> float:
     dot_product = sum([value * weight for value, weight in zip(x, weights)])
     probability = logistic(dot_product)
@@ -23,7 +25,9 @@ def predict_house(x: list[float], house_weights: dict[str, list[float]]) -> str:
     predicted_house = houses[max_index]
     return predicted_house
 
-def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
+# return a list of students, as dictionary with the house name and scores list
+# tracks stats for every feature (min and max)
+def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], feature_stats : list[list[float]]) -> list[dict[str, str | list[float]]]:
 	students : list[dict[str, str | list[float]]] = []
 	for i in range(len(data["Index"])):
 		student : dict[str, str | list[float]]= {}
@@ -40,7 +44,24 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) 
 		except:
 			continue
 		students.append(student)
+		if not len(feature_stats):
+			for j in range(len(student["scores"])):
+				feature_stats.append([student["scores"][j], student["scores"][j]])
+		else:
+			for j in range(len(student["scores"])):
+				feature_stats[j][0] = min(feature_stats[j][0], student["scores"][j])
+				feature_stats[j][1] = max(feature_stats[j][1], student["scores"][j])
 	return students
+
+def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]]):
+	shift : list[float] = []
+	ratio : list[float] = []
+	for value in feature_stats:
+		shift.append((value[0] + value[1]) / 2)
+		ratio.append((abs(value[0]) + abs(value[1])) / 2 / DATA_MAX_VALUE)
+	for student in data:
+		for i in range(len(shift)):
+			student["scores"][i] = (student["scores"][i] - shift[i]) / ratio[i]
 
 def main() -> int:
 	if (len(sys.argv) != 2):
@@ -52,7 +73,9 @@ def main() -> int:
 		house_weights : dict = load(open("weights.json", 'r'))	# open argv weight file instead
 		features : tuple[str] = house_weights["features"]
 		house_weights.pop("features")
-		student_data = format_features(data, features)
+		feature_stats : list[list[float]] = []
+		student_data = format_features(data, features, feature_stats)
+		normalise_data(student_data, feature_stats)
 		
 		NB_TESTS = 1000
 		success = 0

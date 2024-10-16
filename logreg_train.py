@@ -4,8 +4,9 @@ from math import exp, isinf, isnan
 from json import dump
 import matplotlib.pyplot as plt
 
-NB_ITERATIONS = 20000 # totally artificial number
-LEARNING_RATE = 0.001999 # totally artificial number
+NB_ITERATIONS = 5000 # totally artificial number
+LEARNING_RATE = 0.01 # totally artificial number
+DATA_MAX_VALUE = 100
 
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
@@ -92,7 +93,8 @@ def plot_weight_evolution(weight_history, housename):
 	plt.clf()
 
 # return a list of students, as dictionary with the house name and scores list
-def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
+# tracks stats for every feature (min and max)
+def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], feature_stats : list[list[float]]) -> list[dict[str, str | list[float]]]:
 	students : list[dict[str, str | list[float]]] = []
 	for i in range(len(data["Hogwarts House"])):
 		student : dict[str, str | list[float]]= {}
@@ -108,7 +110,24 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) 
 		except:
 			continue
 		students.append(student)
+		if not len(feature_stats):
+			for j in range(len(student["scores"])):
+				feature_stats.append([student["scores"][j], student["scores"][j]])
+		else:
+			for j in range(len(student["scores"])):
+				feature_stats[j][0] = min(feature_stats[j][0], student["scores"][j])
+				feature_stats[j][1] = max(feature_stats[j][1], student["scores"][j])
 	return students
+
+def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : list[list[float]]):
+	shift : list[float] = []
+	ratio : list[float] = []
+	for value in feature_stats:
+		shift.append((value[0] + value[1]) / 2)
+		ratio.append((abs(value[0]) + abs(value[1])) / 2 / DATA_MAX_VALUE)
+	for student in data:
+		for i in range(len(shift)):
+			student["scores"][i] = (student["scores"][i] - shift[i]) / ratio[i]
 
 def main() -> int:
 	if (len(sys.argv) != 2):
@@ -119,7 +138,9 @@ def main() -> int:
 		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
 		house_weights = {"Ravenclaw": [0]*len(features), "Slytherin": [0]*len(features), "Gryffindor": [0]*len(features), "Hufflepuff": [0]*len(features)}
 		data : dict = parse_csv(filename)
-		student_data = format_features(data, features)
+		feature_stats : list[list[float]] = []
+		student_data = format_features(data, features, feature_stats)
+		normalise_data(student_data, feature_stats)
 		loop_house(student_data, house_weights)
 		house_weights["features"] = features
 		dump(house_weights, open('weights.json', 'w'))
