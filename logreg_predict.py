@@ -3,10 +3,10 @@ from utils import parse_csv
 from math import isinf, isnan
 from logreg_train import logistic
 from json import load
-# from stats_utils import max, sum
+from stats_utils import max, sum
 
 def predict(x: list[float], weights: list[float]) -> float:
-    dot_product = sum(value * weight for value, weight in zip(x, weights))
+    dot_product = sum([value * weight for value, weight in zip(x, weights)])
     probability = logistic(dot_product)
     return probability
 
@@ -14,7 +14,13 @@ def predict_house(x: list[float], house_weights: dict[str, list[float]]) -> str:
     house_probabilities = {}
     for house, weights in house_weights.items():
         house_probabilities[house] = predict(x, weights)
-    predicted_house = max(house_probabilities, key=house_probabilities.get)
+
+    houses = list(house_probabilities.keys())
+    probabilities = list(house_probabilities.values())
+
+    max_probability = max(probabilities)
+    max_index = probabilities.index(max_probability)
+    predicted_house = houses[max_index]
     return predicted_house
 
 def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
@@ -46,7 +52,7 @@ def main() -> int:
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
 		houseweights = load(open("weights.json", 'r'))
-		
+
 		NB_TESTS = 1000
 		success = 0
 		for i in range(NB_TESTS):
@@ -56,7 +62,6 @@ def main() -> int:
 			else:
 				print(student_data[i]["index"], student_data[i]["house"], result)
 		print("Precision:", success / NB_TESTS)
-
 
 	except Exception as e:
 		print("Error:", e)

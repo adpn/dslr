@@ -2,9 +2,10 @@ import sys
 from utils import parse_csv
 from math import exp, isinf, isnan
 from json import dump
+import matplotlib.pyplot as plt
 
-NB_ITERATIONS = 1000 # totally artificial number
-LEARNING_RATE = 0.0019 # totally artificial number
+NB_ITERATIONS = 20000 # totally artificial number
+LEARNING_RATE = 0.001999 # totally artificial number
 
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
@@ -50,7 +51,7 @@ def loop_house(data : list[dict], house_weights : dict[str : list[float]]):
 def train(students : list[dict[str, str | list[float]]], housename : str, weights : list[float]):
 	m = len(students)
 	n = len(weights)
-	old_weights = weights.copy()
+	weight_history = []
 
 	print(f"{housename}:", end="", flush=True)
 	for i in range(NB_ITERATIONS):
@@ -60,14 +61,35 @@ def train(students : list[dict[str, str | list[float]]], housename : str, weight
 		for student in students:
 			x = student["scores"]
 			y = 1 if student["house"] == housename else 0
-			h = hypothesis(x, old_weights)
+			h = hypothesis(x, weights)
 
 			for j in range(n):
 				gradiants[j] += (h - y) * x[j]
 
 		for j in range(n):
 			weights[j] -= LEARNING_RATE * gradiants[j] / m
+		weight_history.append(weights.copy())
+
+	plot_weight_evolution(weight_history, housename)
 	print(" >END<")
+
+def plot_weight_evolution(weight_history, housename):
+	iterations = range(len(weight_history))
+	n_weights = len(weight_history[0])
+
+	plt.figure(figsize=(10, 6))
+
+	for j in range(n_weights):
+		weight_evolution = [weights[j] for weights in weight_history]
+		plt.plot(iterations, weight_evolution, label=f'Weight {j + 1}')
+
+	plt.xlabel('Iterations')
+	plt.ylabel('Weight Value')
+	plt.title(f'Evolution of {housename}')
+	plt.legend()
+	plt.grid(True)
+	plt.savefig(f"{housename}.png")
+	plt.clf()
 
 # return a list of students, as dictionnary with the house name and scores
 def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
@@ -103,7 +125,6 @@ def main() -> int:
 
 	except Exception as e:
 		print("Error:", e)
-		e.with_traceback()		# this causes another exception btw, but one with traces, totally intentional
 		return 1
 
 if __name__ == "__main__":
