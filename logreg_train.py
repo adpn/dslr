@@ -69,7 +69,7 @@ def train(students : list[dict[str, str | list[float]]], housename : str, weight
 			weights[j] -= LEARNING_RATE * gradiants[j] / m
 	print(" >END<")
 
-# return a list of students, as dictionnary with the house name and scores
+# return a list of students, as dictionary with the house name and scores list
 def format_features(data : dict[str, list[str]], features_to_keep : tuple[str]) -> list[dict[str, str | list[float]]]:
 	students : list[dict[str, str | list[float]]] = []
 	for i in range(len(data["Hogwarts House"])):
@@ -99,6 +99,7 @@ def main() -> int:
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
 		loop_house(student_data, house_weights)
+		house_weights["features"] = features
 		dump(house_weights, open('weights.json', 'w'))
 
 	except Exception as e:

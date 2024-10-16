@@ -42,15 +42,16 @@ def main() -> int:
 		return 1
 	try:
 		filename = sys.argv[1]
-		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
+		house_weights : dict = load(open("weights.json", 'r'))	# open argv weight file instead
+		features : tuple[str] = house_weights["features"]
+		house_weights.pop("features")
 		data : dict = parse_csv(filename)
 		student_data = format_features(data, features)
-		houseweights = load(open("weights.json", 'r'))
 		
 		NB_TESTS = 1000
 		success = 0
 		for i in range(NB_TESTS):
-			result = predict_house(student_data[i]["scores"], houseweights)
+			result = predict_house(student_data[i]["scores"], house_weights)
 			if result == student_data[i]["house"]:
 				success += 1
 			else:
@@ -60,7 +61,6 @@ def main() -> int:
 
 	except Exception as e:
 		print("Error:", e)
-		e.with_traceback()
 		return 1
 
 if __name__ == "__main__":
