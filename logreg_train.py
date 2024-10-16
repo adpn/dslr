@@ -144,6 +144,7 @@ def main() -> int:
 		normalise_data(student_data, feature_stats)
 		loop_house(student_data, house_weights)
 		house_weights["features"] = features
+		house_weights["normal"] = DATA_MAX_VALUE
 		dump(house_weights, open('weights.json', 'w'))
 
 	except Exception as e:
