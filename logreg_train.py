@@ -1,5 +1,5 @@
 import sys
-from utils import parse_csv, separateHouses
+from utils import parse_csv
 from math import exp, log10, isinf, isnan
 
 # hθ(x) hypothesis function
@@ -30,8 +30,9 @@ def loop_feature(data : list[dict], weights : list[float], house : str, j : int)
 def loop_weight(data : list[dict], weights : list[float], house : str):
 	# print("we loopin weights")			# debug
 	m = len(data)
+	old_weights = weights.copy()
 	for j in range(len(weights)):
-		weights[j] = loop_feature(data, weights, house, j) / m
+		weights[j] = loop_feature(data, old_weights, house, j) / m
 		# print (f"new weight just dropped: {weights[j]}")	# debug
 
 # using the partial derivative formula
