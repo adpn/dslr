@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 from stats_utils import max, min
 
 NB_ITERATIONS = 1000 # totally artificial number
-LEARNING_RATE = 0.005 # totally artificial number
+LEARNING_RATE = 0.01 # totally artificial number
 DATA_MAX_VALUE = 100 # totally artificial number
+FEATURES : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes", "Defense Against the Dark Arts", "Divination", "Flying", "History of Magic", "Muggle Studies"]
 
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
@@ -83,7 +84,7 @@ def plot_weight_evolution(weight_history, housename):
 
 	for j in range(n_weights):
 		weight_evolution = [weights[j] for weights in weight_history]
-		plt.plot(iterations, weight_evolution, label=f'Weight {j + 1}')
+		plt.plot(iterations, weight_evolution, label=FEATURES[j])
 
 	plt.xlabel('Iterations')
 	plt.ylabel('Weight Value')
@@ -95,7 +96,7 @@ def plot_weight_evolution(weight_history, housename):
 
 # return a list of students, as dictionary with the house name and scores list
 # tracks stats for every feature (min and max)
-def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], feature_stats : list[list[float]]) -> list[dict[str, str | list[float]]]:
+def format_features(data : dict[str, list[str]], feature_stats : list[list[float]]) -> list[dict[str, str | list[float]]]:
 	students : list[dict[str, str | list[float]]] = []
 	for i in range(len(data["Hogwarts House"])):
 		student : dict[str, str | list[float]]= {}
@@ -104,7 +105,7 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], 
 		student["house"] = data["Hogwarts House"][i]
 		student["scores"] = []
 		try:
-			for feature in features_to_keep:
+			for feature in FEATURES:
 				student["scores"].append(float(data[feature][i]))
 				if isnan(student["scores"][-1]) or isinf(student["scores"][-1]):
 					continue
@@ -130,20 +131,29 @@ def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : li
 		for i in range(len(shift)):
 			student["scores"][i] = (student["scores"][i] - shift[i]) / ratio[i]
 
+def has_bad_features(data : dict[str, list[str]]) -> bool:
+	result : bool = False
+	for value in FEATURES:
+		if value not in data:
+			print(f"Feature {value}: not found in dataset")
+			result = True
+	return result
+
 def main() -> int:
 	if (len(sys.argv) != 2):
 		print("Usage: python3 logreg_train.py <dataset>")
 		return 1
 	try:
 		filename = sys.argv[1]
-		features : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes"]
-		house_weights = {"Ravenclaw": [0]*len(features), "Slytherin": [0]*len(features), "Gryffindor": [0]*len(features), "Hufflepuff": [0]*len(features)}
+		house_weights = {"Ravenclaw": [0]*len(FEATURES), "Slytherin": [0]*len(FEATURES), "Gryffindor": [0]*len(FEATURES), "Hufflepuff": [0]*len(FEATURES)}
 		data : dict = parse_csv(filename)
+		if has_bad_features(data):
+			return 1
 		feature_stats : list[list[float]] = []
-		student_data = format_features(data, features, feature_stats)
+		student_data = format_features(data, feature_stats)
 		normalise_data(student_data, feature_stats)
 		loop_house(student_data, house_weights)
-		house_weights["features"] = features
+		house_weights["features"] = FEATURES
 		house_weights["normal"] = DATA_MAX_VALUE
 		dump(house_weights, open('weights.json', 'w'))
 

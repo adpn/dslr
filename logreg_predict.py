@@ -75,7 +75,7 @@ def main() -> int:
 		student_data = format_features(data, features, feature_stats)
 		normalise_data(student_data, feature_stats, data_max_value)
 		
-		NB_TESTS = 1000
+		NB_TESTS = len(student_data)
 		success = 0
 		for i in range(NB_TESTS):
 			result = predict_house(student_data[i]["scores"], house_weights)
