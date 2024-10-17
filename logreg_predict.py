@@ -74,16 +74,13 @@ def main() -> int:
 		feature_stats : list[list[float]] = []
 		student_data = format_features(data, features, feature_stats)
 		normalise_data(student_data, feature_stats, data_max_value)
-		
-		NB_TESTS = len(student_data)
-		success = 0
-		for i in range(NB_TESTS):
-			result = predict_house(student_data[i]["scores"], house_weights)
-			if result == student_data[i]["house"]:
-				success += 1
-			else:
-				print(student_data[i]["index"], student_data[i]["house"], result)
-		print("Precision:", success / NB_TESTS)
+
+		nb_lines = len(student_data)
+		with open("houses.csv", 'w') as file:
+			file.write("Index,Hogwarts House\n")
+			for i in range(nb_lines):
+				result = predict_house(student_data[i]["scores"], house_weights)
+				file.write(f'{student_data[i]["index"]},{result}\n')
 
 	except Exception as e:
 		print("Error:", e)
