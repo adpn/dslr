@@ -3,6 +3,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 
+print("Loading training dataset")
 training_data = pd.read_csv('datasets/dataset_train.csv')
 training_data = training_data.drop(columns=['Index', 'First Name', 'Last Name', 'Birthday', 'Best Hand'])
 training_data = training_data.dropna()
@@ -12,9 +13,11 @@ training_data['Hogwarts House'] = label_encoder.fit_transform(training_data['Hog
 X_train = training_data.drop(columns=['Hogwarts House'])
 y_train = training_data['Hogwarts House']
 
+print("Training model")
 model = LogisticRegression(solver='saga', max_iter=5000)
 model.fit(X_train, y_train)
 
+print("Loading test dataset")
 test_data = pd.read_csv('datasets/dataset_test.csv')
 test_data = test_data.drop(columns=['Index', 'First Name', 'Last Name', 'Birthday', 'Best Hand', 'Hogwarts House'])
 test_data = test_data.dropna()
@@ -26,6 +29,7 @@ output_df = pd.DataFrame({
     'Predicted Hogwarts House': house_names
 })
 
+print("Checking with houses.csv")
 true_labels_df = pd.read_csv('houses.csv')
 
 merged_df = pd.merge(output_df, true_labels_df, on='Index', how='inner', suffixes=('_pred', '_true'))

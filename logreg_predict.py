@@ -83,7 +83,7 @@ def main() -> int:
 				file.write(f'{student_data[i]["index"]},{result}\n')
 
 	except Exception as e:
-		print("Error:", e)
+		print("Error", e)
 		return 1
 
 if __name__ == "__main__":

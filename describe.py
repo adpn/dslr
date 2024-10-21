@@ -3,6 +3,9 @@ from utils import parse_csv
 from stats_utils import mean, std, min, max, percentile
 import math
 
+COLUMN_WIDTH = 12
+TOTAL_WIDTH = 15
+
 def describe(data : dict[str, list[str]]) -> dict:
 	stats : dict = {}
 	for key, values in data.items():
@@ -38,15 +41,15 @@ def describe(data : dict[str, list[str]]) -> dict:
 def print_stats(stats : dict):
 	stat_types = ["Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"]
 
-	header = " " * 10
+	header = " " * COLUMN_WIDTH
 	for feature in stats.keys():
-		header += f"{feature[:10]}" + " " * (13 - len(feature[:10]))
+		header += f"{feature[:COLUMN_WIDTH]}" + " " * (TOTAL_WIDTH - len(feature[:COLUMN_WIDTH]))
 	print(header)
 
 	for stat_type in stat_types:
-		line = stat_type + " " * (10 - len(stat_type))
+		line = stat_type + " " * (COLUMN_WIDTH - len(stat_type))
 		for feature in stats.keys():
-			line += f"{stats[feature][stat_type]:.6f}" + " " * (13 - len(f"{stats[feature][stat_type]:.6f}"))
+			line += f"{stats[feature][stat_type]:.6f}" + " " * (TOTAL_WIDTH - len(f"{stats[feature][stat_type]:.6f}"))
 		print(line)
 
 def main() -> int:
@@ -59,7 +62,7 @@ def main() -> int:
 		stats : dict = describe(content)
 		print_stats(stats)
 	except Exception as e:
-		print("Error:", e)
+		print("Error", e)
 		return 1
 
 if __name__ == "__main__":

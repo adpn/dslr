@@ -42,7 +42,7 @@ def main() -> int:
 		house_data = separateHouses(parse_csv(sys.argv[1]))
 		histogram(house_data, "Care of Magical Creatures")
 	except Exception as e:
-		print("Error:", e)
+		print("Error", e)
 		return 1
 
 if __name__ == "__main__":

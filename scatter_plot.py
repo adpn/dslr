@@ -56,7 +56,7 @@ def main() -> int:
 		generate_scatter_plot(house_data, features)
 		print("Done")
 	except Exception as e:
-		print("Error:", e)
+		print("Error", e)
 		return 1
 
 if __name__ == "__main__":

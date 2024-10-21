@@ -138,7 +138,7 @@ def main() -> int:
 		dump(house_weights, open('weights.json', 'w'))
 
 	except Exception as e:
-		print("Error:", e)
+		print("Error", e)
 		return 1
 
 if __name__ == "__main__":
