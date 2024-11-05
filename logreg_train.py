@@ -8,7 +8,8 @@ from stats_utils import max, min
 NB_ITERATIONS = 1000 # totally artificial number
 LEARNING_RATE = 0.01 # totally artificial number
 DATA_MAX_VALUE = 100 # totally artificial number
-FEATURES : tuple[str] = ["Astronomy", "Herbology", "Ancient Runes", "Defense Against the Dark Arts", "Divination", "Flying", "History of Magic", "Muggle Studies"]
+# "Divination", "Flying", "History of Magic", "Muggle Studies"
+FEATURES : tuple[str] = ("Astronomy", "Herbology", "Ancient Runes", "Defense Against the Dark Arts")
 
 # hθ(x) hypothesis function
 # return value should be between 0 and 1
