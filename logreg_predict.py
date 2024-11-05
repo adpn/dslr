@@ -1,6 +1,6 @@
 import sys
 from utils import parse_csv
-from math import isinf, isnan
+from math import isnan, nan
 from logreg_train import logistic
 from json import load
 from stats_utils import max, min, sum
@@ -34,19 +34,20 @@ def format_features(data : dict[str, list[str]], features_to_keep : tuple[str], 
 		student["house"] = data["Hogwarts House"][i]
 		student["index"] = data["Index"][i]
 		student["scores"] = []
-		try:
-			for feature in features_to_keep:
+
+		for feature in features_to_keep:
+			try:
 				student["scores"].append(float(data[feature][i]))
-				if isnan(student["scores"][-1]) or isinf(student["scores"][-1]):
-					continue
-		except:
-			continue
+			except:
+				student["scores"].append(nan)
 		students.append(student)
 		if not len(feature_stats):
 			for j in range(len(student["scores"])):
 				feature_stats.append([student["scores"][j], student["scores"][j]])
 		else:
 			for j in range(len(student["scores"])):
+				if (isnan(student["scores"][j])):
+					continue
 				feature_stats[j][0] = min([feature_stats[j][0], student["scores"][j]])
 				feature_stats[j][1] = max([feature_stats[j][1], student["scores"][j]])
 	return students
@@ -59,6 +60,9 @@ def normalise_data(data : list[dict[str, str | list[float]]], feature_stats : li
 		ratio.append((abs(value[0]) + abs(value[1])) / 2 / max_value)
 	for student in data:
 		for i in range(len(shift)):
+			if isnan(student["scores"][i]):
+				student["scores"][i] = 0
+				continue
 			student["scores"][i] = (student["scores"][i] - shift[i]) / ratio[i]
 
 def main() -> int:
